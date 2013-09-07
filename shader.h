@@ -6,24 +6,25 @@
 
 class Shader {
 public:
-	Shader(std::string shader_name=""); // Default constructor
+    Shader(std::string shader_name=""); // Default constructor
     ~Shader(); // Deconstructor for cleaning up
-    
-	void initShader(unsigned int type, const char * file); // Add a shader
-	void initProgram(); // Init program with shaders intialized so far
-    
+
+    void initShader(unsigned int type, const char * file); // Add a shader
+    void initProgram(); // Init program with shaders intialized so far
+
     void bind(); // Bind our GLSL shader program
     void unbind(); // Unbind our GLSL shader program
-    
+
     unsigned int id(); // Get the identifier for our program
 
-	GLint attribute_v_coord;
-	GLint attribute_v_normal;
+    GLint attribute_v_coord;
+    GLint attribute_v_normal;
+    GLint attribute_v_phase;
 
-	std::string name;
-    
+    std::string name;
+
 private:
-	std::vector<unsigned int> shaders; // Vector of shaders added
+    std::vector<unsigned int> shaders; // Vector of shaders added
     unsigned int shader_id; // The shader program identifier
 };
 
