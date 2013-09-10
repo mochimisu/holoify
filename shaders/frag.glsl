@@ -5,8 +5,10 @@ in vec3 g_patch_distance;
 in vec3 g_tri_distance;
 in vec4 g_position;
 in float g_primitive;
+in float g_phase;
 
 out vec4 frag_color;
+uniform float time;
 
 float amplify(float d, float scale, float offset)
 {
@@ -32,5 +34,5 @@ void main () {
 
 	frag_color = vec4(color, 1.0);
     */
-    frag_color = vec4(1,1,1,0.3);
+    frag_color = vec4(1,sin(g_phase*1.2+1.4*time),0,0.2);
 }

@@ -88,21 +88,21 @@ void Shader::initProgram()
     attribute_v_coord = glGetAttribLocation(shader_id, attribute_name);
     if (attribute_v_coord == - 1)
     {
-        cerr << "Could not bind attribute " << attribute_name;
+        cerr << name << ": Could not bind attribute " << attribute_name << endl;
     };
 
     attribute_name = "vp_norm";
     attribute_v_normal = glGetAttribLocation(shader_id, attribute_name);
     if (attribute_v_normal == - 1)
     {
-    cerr << "Could not bind attribute " << attribute_name;
+    cerr << name << ": Could not bind attribute " << attribute_name << endl;
     }
 
     attribute_name = "vp_phase";
     attribute_v_phase = glGetAttribLocation(shader_id, attribute_name);
     if (attribute_v_phase == - 1)
     {
-    cerr << "Could not bind attribute " << attribute_name;
+    cerr << name << ": Could not bind attribute " << attribute_name << endl;
     }
 }
 

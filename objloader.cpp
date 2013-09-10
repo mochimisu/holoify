@@ -18,6 +18,7 @@ void ObjLoader::loadObj(string filename)
 {
 
     float cur_count;
+    float max_range = 0.f;
 
     obj_vertices.clear();
     obj_normals.clear();
@@ -52,9 +53,13 @@ void ObjLoader::loadObj(string filename)
                 //texture, take care of this later
             }
             else {
-                obj_vertices.push_back(glm::vec4(atof(splitline[1].c_str()),
-                    atof(splitline[2].c_str()),atof(splitline[3].c_str()), 0));
-                obj_phases.push_back(cur_count += 0.3);
+                glm::vec4 cur_v(atof(splitline[1].c_str()),
+                    atof(splitline[2].c_str()),atof(splitline[3].c_str()), 0);
+                obj_vertices.push_back(cur_v);
+                obj_phases.push_back(cur_count += 10);
+                max_range = max(max_range, abs(cur_v.x));
+                max_range = max(max_range, abs(cur_v.y));
+                max_range = max(max_range, abs(cur_v.z));
                 //obj_phases.push_back((float)rand()/(float)RAND_MAX);
             }
         }
@@ -99,6 +104,16 @@ void ObjLoader::loadObj(string filename)
         }
     }
     inpfile.close();
+
+
+    //rescale so the model is inside a unit cube
+    for (std::vector<glm::vec4>::iterator it = obj_vertices.begin();
+        it != obj_vertices.end(); ++it)
+    {
+        it->x = it->x / max_range;
+        it->y = it->y / max_range;
+        it->z = it->z / max_range;
+    }
 
     //ignore textures for now, use geometric averaged normal
     vector<int> nb_seen;

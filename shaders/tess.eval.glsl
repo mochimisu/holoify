@@ -8,6 +8,7 @@ in float evaluationpoint_phase[];
 out vec3 te_position;
 out vec3 te_patch_distance;
 out vec3 te_norm;
+out float te_phase;
 
 uniform float time;
 
@@ -34,7 +35,7 @@ void main () {
   vec3 norm = n0 + n1 + n2;
   float phase = ph0 + ph1 + ph2;
 
-  float sintime = sin(time+20*phase);
+  float sintime = sin(time+phase);
   float sintime2 = sintime*sintime;
   float sintime4 = sintime2*sintime2;
   float sintime8 = sintime4*sintime4;
@@ -45,13 +46,14 @@ void main () {
     sign_mult = -1;
   }
 
-  vec3 pos = p0 + p1 + p2 + norm*0.2*sintime4*sign_mult;
+  vec3 pos = p0 + p1 + p2 + norm*10*sintime4*sign_mult;
 
   vec4 _norm = normalMatrix * vec4(norm,1);
   te_norm = _norm.xyz;
   vec4 _pos = viewMatrix * modelMatrix * vec4(pos,1);
   te_patch_distance = gl_TessCoord;
   te_position = _pos.xyz/_pos.w;
+  te_phase = phase;
 
   gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4 (pos, 1);
 }

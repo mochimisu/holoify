@@ -8,9 +8,10 @@
 
 class GLEngine {
 public:
-    GLEngine(void); 
-    ~GLEngine(void); 
+    GLEngine(void);
+    ~GLEngine(void);
     void setupScene(void); // Initialization
+    void setupFbos(void); // Initialize FBOs
     void reshape(int w, int h); // Resizing window
     void display(void); // Show the scene
     void keyboard(unsigned char key, int x, int y); // Keyboard interaction
@@ -50,6 +51,16 @@ private:
     unsigned int cur_shader;
     unsigned int cur_obj;
     float alpha;
+
+    std::vector<GLuint> fbos;
+
+
+    GLuint bloom_source_fbo, bloom_source_texture;
+    GLuint bloom_pass1_fbo, bloom_pass1_texture;
+    GLuint bloom_fbo, bloom_texture;
+
+    GLuint final_fbo, final_texture, ghost_fbo, ghost_texture;
+    bool final_frame;
 };
 
 #endif
