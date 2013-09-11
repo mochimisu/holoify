@@ -94,9 +94,11 @@ void ObjLoader::loadObj(string filename)
             } else if (num_slash == 2) {
                 if (double_slash)
                 {
-                    sscanf(line.c_str(), "f %d//%d %d//%d %d//%d", &v1, &n1, &v2, &n2, &v3, &n3);
+                    sscanf(line.c_str(), "f %d//%d %d//%d %d//%d",
+                        &v1, &n1, &v2, &n2, &v3, &n3);
                 } else {
-                    sscanf(line.c_str(), "f %d/%d/%d %d/%d/%d %d/%d/%d", &v1, &t1, &n1, &v2, &t2, &n2, &v3, &t3, &n3);
+                    sscanf(line.c_str(), "f %d/%d/%d %d/%d/%d %d/%d/%d",
+                        &v1, &t1, &n1, &v2, &t2, &n2, &v3, &t3, &n3);
                 }
             } else {
                 cout << "Too many slashses in f" << endl;
@@ -150,9 +152,12 @@ void ObjLoader::loadObj(string filename)
             {
                 obj_normals[cur_v] = normal;
             } else {
-                obj_normals[cur_v].x = obj_normals[cur_v].x * (1. - 1./nb_seen[cur_v]) + normal.x * 1./nb_seen[cur_v];
-                obj_normals[cur_v].y = obj_normals[cur_v].y * (1. - 1./nb_seen[cur_v]) + normal.y * 1./nb_seen[cur_v];
-                obj_normals[cur_v].z = obj_normals[cur_v].z * (1. - 1./nb_seen[cur_v]) + normal.z * 1./nb_seen[cur_v];
+                obj_normals[cur_v].x = obj_normals[cur_v].x
+                    * (1. - 1./nb_seen[cur_v]) + normal.x * 1./nb_seen[cur_v];
+                obj_normals[cur_v].y = obj_normals[cur_v].y
+                    * (1. - 1./nb_seen[cur_v]) + normal.y * 1./nb_seen[cur_v];
+                obj_normals[cur_v].z = obj_normals[cur_v].z
+                    * (1. - 1./nb_seen[cur_v]) + normal.z * 1./nb_seen[cur_v];
                 obj_normals[cur_v] = glm::normalize(obj_normals[cur_v]);
             }
         }
@@ -165,7 +170,8 @@ void ObjLoader::upload()
     {
         glGenBuffers(1, &vbo_vertices);
         glBindBuffer(GL_ARRAY_BUFFER, vbo_vertices);
-        glBufferData(GL_ARRAY_BUFFER, obj_vertices.size() * sizeof(obj_vertices[0]),
+        glBufferData(GL_ARRAY_BUFFER,
+            obj_vertices.size() * sizeof(obj_vertices[0]),
             obj_vertices.data(), GL_STATIC_DRAW);
     }
 
@@ -173,7 +179,8 @@ void ObjLoader::upload()
     {
         glGenBuffers(1, &vbo_normals);
         glBindBuffer(GL_ARRAY_BUFFER, vbo_normals);
-        glBufferData(GL_ARRAY_BUFFER, obj_normals.size() * sizeof(obj_normals[0]),
+        glBufferData(GL_ARRAY_BUFFER,
+            obj_normals.size() * sizeof(obj_normals[0]),
             obj_normals.data(), GL_STATIC_DRAW);
     }
 
@@ -181,7 +188,8 @@ void ObjLoader::upload()
     {
         glGenBuffers(1, &ibo_elements);
         glBindBuffer(GL_ARRAY_BUFFER, ibo_elements);
-        glBufferData(GL_ARRAY_BUFFER, obj_elements.size() * sizeof(obj_elements[0]),
+        glBufferData(GL_ARRAY_BUFFER,
+            obj_elements.size() * sizeof(obj_elements[0]),
             obj_elements.data(), GL_STATIC_DRAW);
     }
 
@@ -189,7 +197,8 @@ void ObjLoader::upload()
     {
         glGenBuffers(1, &vbo_phases);
         glBindBuffer(GL_ARRAY_BUFFER, vbo_phases);
-        glBufferData(GL_ARRAY_BUFFER, obj_phases.size() * sizeof(obj_phases[0]),
+        glBufferData(GL_ARRAY_BUFFER,
+            obj_phases.size() * sizeof(obj_phases[0]),
             obj_phases.data(), GL_STATIC_DRAW);
     }
 

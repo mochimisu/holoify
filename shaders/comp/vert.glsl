@@ -1,7 +1,6 @@
 #version 400
 
 in vec3 vp_loc;
-in vec3 vp_norm;
 in float vp_phase;
 
 out vec2 v_tex_coord;

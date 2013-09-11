@@ -12,7 +12,6 @@
 // (0,something), for a two-pass gaussian.
 
 in vec2 v_tex_coord;
-in float v_phase;
 
 uniform sampler2D texture_source;
 uniform vec2 scale;
