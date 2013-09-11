@@ -9,7 +9,7 @@ GLEngine::GLEngine(void)
     mouse_pos = glm::vec2(0.);
     mouse_state = GLUT_LEFT_BUTTON;
     scene_scale = 2.;
-    scene_translate = glm::vec3(0.f,-2.f,0.f);
+    scene_translate = glm::vec3(0.f,-1.f,0.f);
     cur_time = 1;
     tess_level = 0;
     tess_scale = 0.2;
@@ -18,7 +18,7 @@ GLEngine::GLEngine(void)
     rotate = true;
     time_delta = 0.01;
     tess_level_resolution_adjustment = 0;
-
+    point_size = 0;
 }
 
 GLEngine::~GLEngine(void)
@@ -247,41 +247,49 @@ void GLEngine::keyboard(unsigned char key, int x, int y)
     float fdelta = 1;
     switch(key)
     {
-       case 27:
-           exit(0);
-           break;
-       case 'q':
-           delta *= -1;
-       case 'w':
-           if ((tess_level + delta) > -5) {
-               tess_level += delta;
-           }
-           std::cout << "tess_level: " << tess_level << std::endl;
-           break;
-       case 'e':
-           fdelta *= -1;
-       case 'r':
-           fdelta /= 10.f;
-           if ((tess_scale + fdelta) > 0) {
-               tess_scale += fdelta;
-           }
-           std::cout << "tess_scale: " << tess_scale << std::endl;
-           break;
-       case 'O':
-       case 'o':
-           cur_time = std::min(cur_time,1.f);
-           change_obj = true;
-           break;
-       case 'k':
-           rotate = !rotate;
-           break;
-       case '[':
-            time_delta -= 0.003;
-            if (time_delta < 0)
-            {
-                time_delta = 0;
-            }
+        case 27:
+            exit(0);
             break;
+        case 'q':
+            delta *= -1;
+        case 'w':
+            if ((tess_level + delta) > -5) {
+                tess_level += delta;
+            }
+            std::cout << "tess_level: " << tess_level << std::endl;
+            break;
+        case 'e':
+            fdelta *= -1;
+        case 'r':
+            fdelta /= 10.f;
+            if ((tess_scale + fdelta) > 0) {
+                tess_scale += fdelta;
+            }
+            std::cout << "tess_scale: " << tess_scale << std::endl;
+            break;
+        case 't':
+            delta *= -1;
+        case 'y':
+            if ((point_size + delta) >= 0) {
+                point_size += delta;
+                glPointSize(point_size);
+            }
+            std::cout << "point_size: " << point_size << std::endl;
+            break;
+        case 'o':
+            cur_time = std::min(cur_time,1.f);
+            change_obj = true;
+            break;
+        case 'k':
+            rotate = !rotate;
+            break;
+        case '[':
+             time_delta -= 0.003;
+             if (time_delta < 0)
+             {
+                 time_delta = 0;
+             }
+             break;
         case ']':
             time_delta += 0.003;
     break;

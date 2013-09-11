@@ -50,7 +50,7 @@ void main () {
     float clamp_time = -cos(clamp(time*5.f,0.f,3.14f));
 
     // Distance to displace along the normal
-    float dist = 2*sintime2*sintime + (1.f-clamp_time)*40.f;
+    float dist = 2*sin(20*phase)*sintime2*sintime + (1.f-clamp_time)*40.f;
 
     // Our final, displaced position
     vec3 pos = p0 + p1 + p2 + dist*norm;

@@ -64,6 +64,7 @@ private:
     bool rotate;
     bool change_obj;
     float time_delta;
+    int point_size;
 
     // Stuff that's handled automatically
     float cur_time;
