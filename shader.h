@@ -9,7 +9,7 @@ public:
     Shader(std::string shader_name=""); // Default constructor
     ~Shader(); // Deconstructor for cleaning up
 
-    void initShader(unsigned int type, const char * file); // Add a shader
+    void initShader(unsigned int type, std::string file); // Add a shader
     void initProgram(); // Init program with shaders intialized so far
 
     void bind(); // Bind our GLSL shader program

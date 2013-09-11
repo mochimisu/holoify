@@ -71,6 +71,11 @@ void ObjLoader::loadObj(string filename)
             //find "type"
             int num_slash = 0;
             bool double_slash = false;
+            bool quad = false;
+            if (splitline.size() == 5) {
+                quad = true;
+            }
+            //std::cout << quad << std::endl;
             for (unsigned int i=0; i<splitline[1].length(); i++) {
                 if (splitline[1][i] == '/')
                 {
@@ -105,6 +110,10 @@ void ObjLoader::loadObj(string filename)
     }
     inpfile.close();
 
+    num_vertices = obj_vertices.size();
+    std::cout << "vertices: " << num_vertices << std::endl;
+    std::cout << "vertices log10: " << std::log10(num_vertices) << std::endl;
+
 
     //rescale so the model is inside a unit cube
     for (std::vector<glm::vec4>::iterator it = obj_vertices.begin();
@@ -128,6 +137,7 @@ void ObjLoader::loadObj(string filename)
         glm::vec3 normal = glm::normalize(glm::cross(
             glm::vec3(obj_vertices[ib]) - glm::vec3(obj_vertices[ia]),
             glm::vec3(obj_vertices[ic]) - glm::vec3(obj_vertices[ia])));
+        //normal = glm::vec3(0,1,0);
 
         int v[3];
         v[0] = ia; v[1] = ib; v[2] = ic;

@@ -1,5 +1,6 @@
 #include "glengine.h"
 #include <cstdio>
+#include <dirent.h>
 
 GLEngine::GLEngine(void)
 {
@@ -11,7 +12,14 @@ GLEngine::GLEngine(void)
     scene_translate = glm::vec3(0.f,-2.f,0.f);
     cur_shader = 0;
     alpha = 1;
+    cur_time = 1;
+    tess_level = 0;
+    tess_scale = 0.2;
     final_frame = false;
+    change_obj = false;
+    rotate = true;
+    time_delta = 0.01;
+    tess_level_resolution_adjustment = 0;
 }
 
 GLEngine::~GLEngine(void)
@@ -25,45 +33,51 @@ GLEngine::~GLEngine(void)
 void GLEngine::setupScene(void)
 {
     glClearColor(0.f, 0.f, 0.f, 0.f);
+    std::string shaders_dir = "/home/brandonwang/stuff/holoify/shaders";
 
     Shader * avg_tes = new Shader("Averaging Tess + Normal Extrusion");
-    avg_tes->initShader(GL_VERTEX_SHADER, "shaders/vert.glsl");
-    avg_tes->initShader(GL_TESS_CONTROL_SHADER, "shaders/tess.control.glsl");
-    avg_tes->initShader(GL_TESS_EVALUATION_SHADER, "shaders/tess.eval.glsl");
-    avg_tes->initShader(GL_GEOMETRY_SHADER, "shaders/geometry.glsl");
-    avg_tes->initShader(GL_FRAGMENT_SHADER, "shaders/frag.glsl");
+    avg_tes->initShader(GL_VERTEX_SHADER, shaders_dir+"/mainpoint/vert.glsl");
+    avg_tes->initShader(GL_TESS_CONTROL_SHADER, shaders_dir+"/mainpoint/tess.control.glsl");
+    avg_tes->initShader(GL_TESS_EVALUATION_SHADER, shaders_dir+"/mainpoint/tess.eval.glsl");
+    avg_tes->initShader(GL_GEOMETRY_SHADER, shaders_dir+"/mainpoint/geometry.glsl");
+    avg_tes->initShader(GL_FRAGMENT_SHADER, shaders_dir+"/mainpoint/frag.glsl");
     avg_tes->initProgram();
     shaders.push_back(avg_tes);
 
     Shader * bloom = new Shader("Bloom");
-    bloom->initShader(GL_VERTEX_SHADER, "shaders/bloom/vert.glsl");
-    bloom->initShader(GL_FRAGMENT_SHADER, "shaders/bloom/frag.glsl");
+    bloom->initShader(GL_VERTEX_SHADER, shaders_dir+"/bloom/vert.glsl");
+    bloom->initShader(GL_FRAGMENT_SHADER, shaders_dir+"/bloom/frag.glsl");
     bloom->initProgram();
     shaders.push_back(bloom);
 
     Shader * comp = new Shader("Comp");
-    comp->initShader(GL_VERTEX_SHADER, "shaders/comp/vert.glsl");
-    comp->initShader(GL_FRAGMENT_SHADER, "shaders/comp/frag.glsl");
+    comp->initShader(GL_VERTEX_SHADER, shaders_dir+"/comp/vert.glsl");
+    comp->initShader(GL_FRAGMENT_SHADER, shaders_dir+"/comp/frag.glsl");
     comp->initProgram();
     shaders.push_back(comp);
 
     Shader * final = new Shader("Final");
-    final->initShader(GL_VERTEX_SHADER, "shaders/final/vert.glsl");
-    final->initShader(GL_FRAGMENT_SHADER, "shaders/final/frag.glsl");
+    final->initShader(GL_VERTEX_SHADER, shaders_dir+"/final/vert.glsl");
+    final->initShader(GL_FRAGMENT_SHADER, shaders_dir+"/final/frag.glsl");
     final->initProgram();
     shaders.push_back(final);
 
+    Shader * wireframe = new Shader("Wireframe");
+    wireframe->initShader(GL_VERTEX_SHADER, shaders_dir+"/wireframe/vert.glsl");
+    wireframe->initShader(GL_TESS_CONTROL_SHADER, shaders_dir+"/wireframe/tess.control.glsl");
+    wireframe->initShader(GL_TESS_EVALUATION_SHADER, shaders_dir+"/wireframe/tess.eval.glsl");
+    wireframe->initShader(GL_GEOMETRY_SHADER, shaders_dir+"/wireframe/geometry.glsl");
+    wireframe->initShader(GL_FRAGMENT_SHADER, shaders_dir+"/wireframe/frag.glsl");
+    wireframe->initProgram();
+    shaders.push_back(wireframe);
+
+
     shader = avg_tes;
 
-    obj_filenames.push_back("data/bunny2.obj");
-    obj_filenames.push_back("data/dragon.obj");
-    obj.loadObj("data/bunny2.obj");
-    obj.upload();
+    loadObjs("/home/brandonwang/stuff/holoify/data/pixar");
 
     projection_matrix = glm::perspective(60.0f, (float)window_width / (float)window_height, 0.1f, 100.f);  // Create our perspective matrix
 
-    tess_level = 2;
-    cur_time = 0;
     inited = true;
 
     setupFbos();
@@ -71,7 +85,42 @@ void GLEngine::setupScene(void)
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glPointSize(2);
+    glPointSize(1);
+}
+
+void GLEngine::loadObjs(std::string dir)
+{
+    DIR * dirp;
+    struct dirent *ep;
+    dirp = opendir(dir.c_str());
+    if (dirp != NULL)
+    {
+        while((ep = readdir(dirp)))
+        {
+            std::string fname = ep->d_name;
+            if (fname.substr(fname.find_last_of(".")+1) == "obj") {
+                obj_filenames.push_back(dir+"/"+fname);
+            }
+        }
+    }
+    closedir(dirp);
+
+    obj.loadObj(obj_filenames.front());
+    obj.upload();
+}
+
+void GLEngine::deleteFbos()
+{
+    glDeleteFramebuffers(1, &bloom_source_fbo);
+    glDeleteTextures(1, &bloom_source_texture);
+    glDeleteFramebuffers(1, &bloom_pass1_fbo);
+    glDeleteTextures(1, &bloom_pass1_texture);
+    glDeleteFramebuffers(1, &bloom_fbo);
+    glDeleteTextures(1, &bloom_texture);
+    glDeleteFramebuffers(1, &ghost_fbo);
+    glDeleteTextures(1, &ghost_texture);
+    glDeleteFramebuffers(1, &final_fbo);
+    glDeleteTextures(1, &final_texture);
 }
 
 void GLEngine::setupFbos()
@@ -163,9 +212,13 @@ void GLEngine::reshape(int w, int h)
 {
     window_width = w; // Set the window width
     window_height = h; // Set the window height
+    std::cout << "Reshaped to " << w << "x" << h << std::endl;
+    int maxdim = std::max(w,h);
+    tess_level_resolution_adjustment = maxdim/1600;
 
     projection_matrix = glm::perspective(60.0f, (float)window_width / (float)window_height, 0.1f, 100.f);  // Create our perspective matrix
     glViewport(0,0,w,h);
+    deleteFbos();
     setupFbos();
 }
 
@@ -231,9 +284,19 @@ void GLEngine::keyboard(unsigned char key, int x, int y)
      case 'q':
      delta *= -1;
      case 'w':
-         if ((tess_level + delta) > 0) {
+         if ((tess_level + delta) > -5) {
              tess_level += delta;
          }
+         std::cout << "tess_level: " << tess_level << std::endl;
+     break;
+     case 'e':
+     fdelta *= -1;
+     case 'r':
+        fdelta /= 10.f;
+         if ((tess_scale + fdelta) > 0) {
+             tess_scale += fdelta;
+         }
+         std::cout << "tess_scale: " << tess_scale << std::endl;
      break;
      case 'A':
          fdelta *= -1;
@@ -245,21 +308,51 @@ void GLEngine::keyboard(unsigned char key, int x, int y)
          std::cout << "alpha: " << alpha << std::endl;
          break;
      case 'O':
-         delta += obj_filenames.size()-2;
      case 'o':
-         cur_obj = (cur_obj+delta)%obj_filenames.size();
-         obj.loadObj(obj_filenames[cur_obj]);
-         obj.upload();
-         std::cout << obj_filenames[cur_obj].c_str() << std::endl;
+         cur_time = std::min(cur_time,1.f);
+         change_obj = true;
          break;
-     break;
+     case 'k':
+         rotate = !rotate;
+         break;
+     case '[':
+         time_delta -= 0.003;
+         if (time_delta < 0)
+         {
+            time_delta = 0;
+         }
+         break;
+     case ']':
+         time_delta += 0.003;
+         break;
  }
  glutPostRedisplay();
+}
+
+void GLEngine::cycleObj(void)
+{
+   cur_obj = (cur_obj+1)%obj_filenames.size();
+   obj.loadObj(obj_filenames[cur_obj]);
+   obj.upload();
+   std::cout << obj_filenames[cur_obj].c_str() << std::endl;
 }
 
 
 void GLEngine::display(void)
 {
+    if (change_obj)
+    {
+        cur_time -= 0.01f;
+
+        if (cur_time < 0.15f)
+        {
+            cycleObj();
+            rot_orientation = glm::rotate(glm::mat4(1.f), -30.f, glm::vec3(0.f,1.f,0.f));
+            change_obj = false;
+        }
+    } else {
+        cur_time += time_delta;
+    }
     //switch between final frame and ghost frame
     final_frame = !final_frame;
 
@@ -281,14 +374,16 @@ void GLEngine::display(void)
         cur_ghost_fbo = final_fbo;
     }
 
-    cur_time += 0.001;
 
     glBindFramebuffer(GL_FRAMEBUFFER, bloom_source_fbo);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear required buffers
 
     view_matrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.f)); // Create our view matrix
     glm::vec3 axis(0.f, 1.f, 0.f);
-    rot_orientation = glm::rotate(rot_orientation, 0.1f, axis);
+    if (rotate)
+    {
+        rot_orientation = glm::rotate(rot_orientation, 0.1f, axis);
+    }
     model_matrix = glm::translate(glm::mat4(1.0f), scene_translate) * glm::scale(glm::mat4(1.0f), glm::vec3(scene_scale)) * rot_orientation;  // Create our model matrix
     normal_matrix = glm::transpose(glm::inverse(view_matrix*model_matrix));
 
@@ -300,7 +395,8 @@ void GLEngine::display(void)
     int viewMatrixLocation = glGetUniformLocation(cur_shader->id(), "viewMatrix"); // Get the location of our view matrix in the cur_shader
     int modelMatrixLocation = glGetUniformLocation(cur_shader->id(), "modelMatrix"); // Get the location of our model matrix in the cur_shader
     int normalMatrixLocation = glGetUniformLocation(cur_shader->id(), "normalMatrix"); // Get the location of our normal matrix in the cur_shader
-    int tl_loc = glGetUniformLocation(cur_shader->id(), "tessLevel");
+    int tl_loc = glGetUniformLocation(cur_shader->id(), "tess_level");
+    int ts_loc = glGetUniformLocation(cur_shader->id(), "tess_scale");
     int time_loc = glGetUniformLocation(cur_shader->id(), "time");
     int camera_loc = glGetUniformLocation(cur_shader->id(), "camera");
     int alpha_loc = glGetUniformLocation(cur_shader->id(), "alpha");
@@ -310,17 +406,17 @@ void GLEngine::display(void)
     glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &model_matrix[0][0]); // Send our model matrix to the cur_shader
     glUniformMatrix4fv(normalMatrixLocation, 1, GL_FALSE, &normal_matrix[0][0]); // Send our model matrix to the cur_shader
     glUniform3f(camera_loc, 0,0,0);
-    glUniform1f(tl_loc, tess_level);
+    glUniform1f(tl_loc, std::ceil(std::max(5.-log10(obj.num_vertices),0.))+tess_level+tess_level_resolution_adjustment);
+    glUniform1f(ts_loc, tess_scale);
     glUniform1f(time_loc, cur_time);
     glUniform1f(alpha_loc, alpha);
 
 
-    glPatchParameteri(GL_PATCH_VERTICES, 3);
+    glPatchParameteri(GL_PATCH_VERTICES, 4);
 
     obj.draw(cur_shader);
 
     cur_shader->unbind(); // Unbind our cur_shader
-
     // blur in x
     glBindFramebuffer(GL_FRAMEBUFFER, bloom_pass1_fbo);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear required buffers
@@ -331,7 +427,7 @@ void GLEngine::display(void)
     int scale_loc = glGetUniformLocation(cur_shader->id(), "scale");
     int texture_source_loc = glGetUniformLocation(cur_shader->id(), "texture_source");
     time_loc = glGetUniformLocation(cur_shader->id(), "time");
-    glUniform2f(scale_loc, 1.f/window_width, 0);
+    glUniform2f(scale_loc, 0.4f/window_width, 0);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, bloom_source_texture);
     glUniform1i(texture_source_loc, 0);
@@ -348,7 +444,7 @@ void GLEngine::display(void)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear required buffers
     glViewport(0,0,window_width,window_height);
 
-    glUniform2f(scale_loc, 0, 1.f/window_height);
+    glUniform2f(scale_loc, 0, 0.4f/window_height);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, bloom_pass1_texture);
     glUniform1i(texture_source_loc, 0);
@@ -410,7 +506,7 @@ void GLEngine::display(void)
 
     cur_shader->unbind();
 
-    // display
+    // display*/
 
     glutSwapBuffers(); // Swap buffers so we can see our rendering
 }

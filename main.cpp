@@ -44,7 +44,7 @@ int main(int argc, char** argv)
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 
     glutInitWindowSize(width,height);
-    glutCreateWindow("CS284 subdivision shader");
+    glutCreateWindow("hologram shader");
 
     GLenum err = glewInit();
     if (err != GLEW_OK) {

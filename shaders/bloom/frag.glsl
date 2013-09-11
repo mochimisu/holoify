@@ -1,4 +1,15 @@
 #version 400
+// Bloom!
+// This one is a bit weird - I am doing a weighted gaussian blur
+// My bloom is going to be one color in the end, and its intensity is
+// controlled by frag_color.x
+//
+// I weigh by a sum of the y component, which is typically [0,1], and is a
+// sinusoid-like-kinda function of time, varied by phase, and was generated
+// in the main shader.
+//
+// This shader is ran twice, once with scale as (something,0) and again as
+// (0,something), for a two-pass gaussian.
 
 in vec2 v_tex_coord;
 in float v_phase;
@@ -46,5 +57,6 @@ void main () {
     //frag_color = vec4(0,sum.x*(2+0.5*cos(sum.y*1000+time)),0,1);
     //frag_color = vec4(sum,cur_samp.y,sum*cur_samp.y,1);
     //frag_color = vec4(cur_samp);
-    frag_color = vec4((1+sum.y)*sum.x,sum.y,0,1);
+    frag_color = vec4((0.65+2.f*sum.y)*sum.x,sum.y,0,1);
+    //frag_color = vec4(sum.x,sum.y,0,1);
 }

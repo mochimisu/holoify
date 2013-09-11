@@ -57,14 +57,14 @@ Shader::Shader(string shader_name) {
     name = shader_name;
 }
 
-void Shader::initShader(unsigned int type, const char * file) {
+void Shader::initShader(unsigned int type, std::string file) {
     unsigned int shader = glCreateShader(type);
     unsigned int compiled;
-    string str = textFileRead(file);
+    string str = textFileRead(file.c_str());
     const char * cstr = str.c_str();
     glShaderSource(shader, 1, &cstr, NULL);
     glCompileShader(shader);
-    validateShader(shader, file);
+    validateShader(shader, file.c_str());
     shaders.push_back(shader);
 }
 

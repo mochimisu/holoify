@@ -1,5 +1,7 @@
 #version 400
 
+// A geometry shader-based wireframe shader.
+
 in vec3 g_normal;
 in vec3 g_patch_distance;
 in vec3 g_tri_distance;
@@ -18,7 +20,6 @@ float amplify(float d, float scale, float offset)
     return d;
 }
 void main () {
-/*
 	vec3 light_pos = vec3(0,0,5);
 	vec3 ambient = vec3(0.6);
 
@@ -29,10 +30,8 @@ void main () {
 	float d1 = min(min(g_tri_distance.x, g_tri_distance.y), g_tri_distance.z);
 	float d2 = min(min(g_patch_distance.x, g_patch_distance.y), g_patch_distance.z);
 
-
 	vec3 color = amplify(d1, 40, -0.5) * amplify(d2, 60, -0.5) * (vec3(ndl) + ambient);
+    float intensity = 1-amplify(d1,10,-0.5);
 
-	frag_color = vec4(color, 1.0);
-    */
-    frag_color = vec4(1,sin(g_phase*1.2+1.4*time),0,0.2);
+	frag_color = vec4(0,0,intensity,1);
 }

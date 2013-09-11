@@ -1,4 +1,5 @@
 #version 400
+// All I'm doing is displaying the texture.
 
 in vec2 v_tex_coord;
 

@@ -11,6 +11,7 @@ public:
     GLEngine(void);
     ~GLEngine(void);
     void setupScene(void); // Initialization
+    void deleteFbos(void); // Initialize FBOs
     void setupFbos(void); // Initialize FBOs
     void reshape(int w, int h); // Resizing window
     void display(void); // Show the scene
@@ -18,6 +19,8 @@ public:
     void mouseFunc(int button, int state, int x, int y);
     void activeMotion(int x, int y);
     void passiveMotion(int x, int y);
+    void cycleObj();
+    void loadObjs(std::string dir);
 
 private:
     int window_width; // Store the width of our window
@@ -41,7 +44,9 @@ private:
     unsigned int vbo_id[1]; // Our Vertex Buffer Object
 
     float tess_level;
+    float tess_scale;
     float cur_time;
+    float tess_level_resolution_adjustment;
 
     bool inited;
     int mouse_state;
@@ -61,6 +66,9 @@ private:
 
     GLuint final_fbo, final_texture, ghost_fbo, ghost_texture;
     bool final_frame;
+    bool change_obj;
+    bool rotate;
+    float time_delta;
 };
 
 #endif
