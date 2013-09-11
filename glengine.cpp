@@ -181,7 +181,7 @@ void GLEngine::reshape(int w, int h)
     window_height = h; // Set the window height
     std::cout << "Reshaped to " << w << "x" << h << std::endl;
     int maxdim = std::max(w,h);
-    tess_level_resolution_adjustment = maxdim/1600;
+    //tess_level_resolution_adjustment = maxdim/1600;
 
     projection_matrix = glm::perspective(60.0f,
         (float)window_width / (float)window_height, 0.1f, 100.f);

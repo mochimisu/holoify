@@ -8,13 +8,13 @@ ifeq ($(UNAME), Darwin)
 	INCLUDE := -I./include/ -I/usr/X11/include -I./glm -DOSX
 	LDFLAGS := -framework GLUT -framework OpenGL -L./lib/mac/ \
 		-L"/System/Library/Frameworks/OpenGL.framework/Libraries" \
-		-lGL -lGLU -lm -lstdc++ -lfreeimage -lGLEW
+		-lGL -lGLU -lm -lstdc++ -lGLEW
 else
 	INCLUDE := -I./include/ -I/usr/X11R6/include -I/sw/include \
 		 -I/usr/sww/include -I/usr/sww/pkg/Mesa/include -I./glm
 	LDFLAGS := -L./lib/nix -L/usr/X11R6/lib -L/sw/lib -L/usr/sww/lib \
 		-L/usr/sww/bin -L/usr/sww/pkg/Mesa/lib -lGL -lglut -lGLU -lX11 \
-		-lGLEW -lfreeimage
+		-lGLEW
 endif
 
 CXX := g++
