@@ -9,7 +9,7 @@ GLEngine::GLEngine(void)
     mouse_pos = glm::vec2(0.);
     mouse_state = GLUT_LEFT_BUTTON;
     scene_scale = 2.;
-    scene_translate = glm::vec3(0.f,-1.f,0.f);
+    scene_translate = glm::vec3(0.f,-1.5f,0.f);
     cur_time = 1;
     tess_level = 0;
     tess_scale = 0.2;
