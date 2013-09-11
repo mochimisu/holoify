@@ -12,10 +12,10 @@ out float evaluationpoint_phase[];
 uniform float tessLevel;
 
 void main () {
-  evaluationpoint_wor[gl_InvocationID] = controlpoint_wor[gl_InvocationID];
-  evaluationpoint_norm[gl_InvocationID] = controlpoint_norm[gl_InvocationID];
-  evaluationpoint_phase[gl_InvocationID] = controlpoint_phase[gl_InvocationID];
+    evaluationpoint_wor[gl_InvocationID] = controlpoint_wor[gl_InvocationID];
+    evaluationpoint_norm[gl_InvocationID] = controlpoint_norm[gl_InvocationID];
+    evaluationpoint_phase[gl_InvocationID] = controlpoint_phase[gl_InvocationID];
 
-  gl_TessLevelInner[0] = 0;
-  gl_TessLevelOuter[gl_InvocationID] = 1;
+    gl_TessLevelInner[0] = 0;
+    gl_TessLevelOuter[gl_InvocationID] = 1;
 }
