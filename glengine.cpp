@@ -43,10 +43,10 @@ void GLEngine::setupScene(void)
     Shader * avg_tes = new Shader("Averaging Tess + Normal Extrusion");
     avg_tes->initShader(GL_VERTEX_SHADER,
        shaders_dir+"/mainpoint/vert.glsl");
-    avg_tes->initShader(GL_TESS_CONTROL_SHADER,
-       shaders_dir+"/mainpoint/tess.control.glsl");
-    avg_tes->initShader(GL_TESS_EVALUATION_SHADER,
-       shaders_dir+"/mainpoint/tess.eval.glsl");
+    //avg_tes->initShader(GL_TESS_CONTROL_SHADER,
+    //   shaders_dir+"/mainpoint/tess.control.glsl");
+    //avg_tes->initShader(GL_TESS_EVALUATION_SHADER,
+    //   shaders_dir+"/mainpoint/tess.eval.glsl");
     avg_tes->initShader(GL_GEOMETRY_SHADER,
        shaders_dir+"/mainpoint/geometry.glsl");
     avg_tes->initShader(GL_FRAGMENT_SHADER,
@@ -78,20 +78,6 @@ void GLEngine::setupScene(void)
     final->initProgram();
     shaders.push_back(final);
 
-    Shader * wireframe = new Shader("Wireframe");
-    wireframe->initShader(GL_VERTEX_SHADER,
-       shaders_dir+"/wireframe/vert.glsl");
-    wireframe->initShader(GL_TESS_CONTROL_SHADER,
-       shaders_dir+"/wireframe/tess.control.glsl");
-    wireframe->initShader(GL_TESS_EVALUATION_SHADER,
-       shaders_dir+"/wireframe/tess.eval.glsl");
-    wireframe->initShader(GL_GEOMETRY_SHADER,
-       shaders_dir+"/wireframe/geometry.glsl");
-    wireframe->initShader(GL_FRAGMENT_SHADER,
-       shaders_dir+"/wireframe/frag.glsl");
-    wireframe->initProgram();
-    shaders.push_back(wireframe);
-
     // 5 FBOs:
     // Main
     // Bloom pass 1
@@ -101,6 +87,11 @@ void GLEngine::setupScene(void)
     for (int i = 0; i < 5; ++i)
     {
         fbos.push_back(new Fbo());
+    }
+
+    for (int i = 0; i < fbos.size(); ++i)
+    {
+      std::cout << i << ": " << fbos[i]->fbo << ", " << fbos[i]->texture << std::endl;
     }
 
     loadObjs("data/pixar");
@@ -169,7 +160,8 @@ void GLEngine::setupFbos()
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-        glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, 
+            GL_TEXTURE_2D,
             cur_fbo_it->texture, 0);
     }
 
@@ -399,7 +391,7 @@ void GLEngine::display(void)
     glUniform1f(ts_loc, tess_scale);
     glUniform1f(time_loc, cur_time);
 
-    glPatchParameteri(GL_PATCH_VERTICES, 3);
+    //glPatchParameteri(GL_PATCH_VERTICES, 3);
 
     obj.draw(main_shader);
 

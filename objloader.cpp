@@ -245,7 +245,7 @@ void ObjLoader::draw(Shader * shader)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_elements);
     int size;
     glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
-    glDrawElements(GL_PATCHES, size/sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
+    glDrawElements(GL_TRIANGLES, size/sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
 
     glDisableVertexAttribArray(v_coord_attrib);
     glDisableVertexAttribArray(v_normal_attrib);

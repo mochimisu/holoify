@@ -62,15 +62,32 @@ void Shader::initShader(unsigned int type, std::string file) {
     unsigned int compiled;
     string str = textFileRead(file.c_str());
     const char * cstr = str.c_str();
+
     glShaderSource(shader, 1, &cstr, NULL);
     glCompileShader(shader);
     validateShader(shader, file.c_str());
+
+
     shaders.push_back(shader);
 }
 
 void Shader::initProgram()
 {
     shader_id = glCreateProgram();
+    
+    // Set these things in OpenGL 3.2
+    // (Higher versions, this stuff is set inside the Geometry Shader)
+    if (true)
+    {
+      glProgramParameteriEXT(shader_id,
+          GL_GEOMETRY_INPUT_TYPE_EXT, GL_TRIANGLES);
+      glProgramParameteriEXT(shader_id,
+          GL_GEOMETRY_OUTPUT_TYPE_EXT, GL_POINTS);
+      glProgramParameteriEXT(shader_id,
+          GL_GEOMETRY_VERTICES_OUT_EXT, 3);
+    }
+
+
     GLint linked;
     for (std::vector<unsigned int>::iterator it = shaders.begin();
         it != shaders.end(); ++it)

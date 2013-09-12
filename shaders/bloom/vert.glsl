@@ -1,8 +1,8 @@
-#version 400
+#version 120
 
-in vec3 vp_loc;
+attribute vec3 vp_loc;
 
-out vec2 v_tex_coord;
+varying vec2 v_tex_coord;
 
 void main(void)
 {

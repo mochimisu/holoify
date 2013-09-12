@@ -6,7 +6,7 @@ HEADERS := $(wildcard ./*.h)
 UNAME := $(shell uname)
 ifeq ($(UNAME), Darwin)
 	INCLUDE := -I./include/ -I/usr/X11/include -I./glm -DOSX
-	LDFLAGS := -framework GLUT -framework OpenGL -L./lib/mac/ \
+	LDFLAGS := -framework GLUT -framework OpenGL -L./lib/osx \
 		-L"/System/Library/Frameworks/OpenGL.framework/Libraries" \
 		-lGL -lGLU -lm -lstdc++ -lGLEW
 else

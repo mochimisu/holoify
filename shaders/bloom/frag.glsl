@@ -1,4 +1,4 @@
-#version 400
+#version 120
 // Bloom!
 // This one is a bit weird - I am doing a weighted gaussian blur
 // My bloom is going to be one color in the end, and its intensity is
@@ -11,13 +11,11 @@
 // This shader is ran twice, once with scale as (something,0) and again as
 // (0,something), for a two-pass gaussian.
 
-in vec2 v_tex_coord;
+varying vec2 v_tex_coord;
 
 uniform sampler2D texture_source;
 uniform vec2 scale;
 uniform float time;
-
-out vec4 frag_color;
 
 void main () {
     vec4 sum = vec4(0.f);
@@ -56,6 +54,6 @@ void main () {
     //frag_color = vec4(0,sum.x*(2+0.5*cos(sum.y*1000+time)),0,1);
     //frag_color = vec4(sum,cur_samp.y,sum*cur_samp.y,1);
     //frag_color = vec4(cur_samp);
-    frag_color = vec4((0.65+2.f*sum.y)*sum.x,sum.y,0,1);
+    gl_FragColor = vec4((0.65+2.f*sum.y)*sum.x,sum.y,0,1);
     //frag_color = vec4(sum.x,sum.y,0,1);
 }
